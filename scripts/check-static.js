@@ -13,6 +13,10 @@ for (const ref of ["manifest.webmanifest", "styles.css", "app.js"]) {
   if (!html.includes(ref)) throw new Error(`Missing HTML reference: ${ref}`);
 }
 
+const app = await readFile(new URL("../app.js", import.meta.url), "utf8");
+if (app.includes("innerHTML")) throw new Error("Module metadata must be rendered with textContent, not innerHTML");
+if (!app.includes('activeModuleId === "connection.snapshot"')) throw new Error("Open connection results must refresh on connectivity changes");
+
 const sw = await readFile(new URL("../sw.js", import.meta.url), "utf8");
 for (const asset of required.filter((path) => path !== "sw.js")) {
   if (!sw.includes(`./${asset}`) && asset !== "index.html") throw new Error(`Service worker shell misses: ${asset}`);

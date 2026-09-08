@@ -9,7 +9,7 @@ const fields = document.querySelector("#result-fields");
 const note = document.querySelector("#result-note");
 const liveStatus = document.querySelector("#live-status");
 
-const escapeText = (value) => String(value ?? "");
+let activeModuleId = null;
 
 function renderDeck() {
   deck.replaceChildren(...capabilityModules.map((module, index) => {
@@ -20,18 +20,27 @@ function renderDeck() {
       card.type = "button";
       card.addEventListener("click", () => runModule(module, card));
     }
-    card.innerHTML = `
-      <span class="module-index" aria-hidden="true">0${index + 1}</span>
-      <span class="module-copy">
-        <strong>${escapeText(module.title)}</strong>
-        <span>${escapeText(module.description)}</span>
-      </span>
-      <span class="module-state">${available ? "Run" : module.availability === "native-required" ? "Needs native" : "Planned"}</span>`;
+    const moduleIndex = document.createElement("span");
+    moduleIndex.className = "module-index";
+    moduleIndex.setAttribute("aria-hidden", "true");
+    moduleIndex.textContent = `0${index + 1}`;
+    const copy = document.createElement("span");
+    copy.className = "module-copy";
+    const moduleTitle = document.createElement("strong");
+    moduleTitle.textContent = module.title;
+    const description = document.createElement("span");
+    description.textContent = module.description;
+    copy.append(moduleTitle, description);
+    const state = document.createElement("span");
+    state.className = "module-state";
+    state.textContent = available ? "Run" : module.availability === "native-required" ? "Needs native" : "Planned";
+    card.append(moduleIndex, copy, state);
     return card;
   }));
 }
 
 async function runModule(module, trigger) {
+  activeModuleId = module.id;
   trigger.disabled = true;
   trigger.classList.add("is-running");
   trigger.querySelector(".module-state").textContent = "Checking…";
@@ -87,10 +96,15 @@ function updateLiveStatus() {
   const online = navigator.onLine;
   liveStatus.textContent = online ? "Browser online" : "Browser offline";
   liveStatus.classList.toggle("is-offline", !online);
+  if (!panel.hidden && activeModuleId === "connection.snapshot") {
+    const connectionModule = capabilityModules.find(({ id }) => id === activeModuleId);
+    connectionModule.run({ navigator }).then(renderResult).catch(() => {});
+  }
 }
 
 document.querySelector("#close-result").addEventListener("click", () => {
   panel.hidden = true;
+  activeModuleId = null;
   document.querySelector(".action-card.is-available")?.focus();
 });
 
