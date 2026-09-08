@@ -1,0 +1,13 @@
+{
+  "name": "network-knackers-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --check app.js && node --check capabilities.js && node --check sw.js && node scripts/check-static.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

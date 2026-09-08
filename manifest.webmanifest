@@ -1,0 +1,13 @@
+{
+  "name": "Network Knackers",
+  "short_name": "Knackers",
+  "description": "One-touch, browser-safe network answers.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07131f",
+  "theme_color": "#07131f",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#07131f" />
+    <meta name="description" content="One-touch, browser-safe network answers." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Network Knackers</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <p class="eyebrow">Network utility</p>
+          <h1>Network Knackers</h1>
+        </div>
+        <span id="live-status" class="live-status" role="status">Checking…</span>
+      </header>
+
+      <section class="intro" aria-labelledby="deck-title">
+        <h2 id="deck-title">What do you need to know?</h2>
+        <p>Tap an available action. Network details stay on this device.</p>
+      </section>
+
+      <section id="action-deck" class="action-deck" aria-label="Network actions"></section>
+
+      <section id="result-panel" class="result-panel" aria-live="polite" aria-atomic="false" hidden>
+        <div class="result-heading">
+          <div>
+            <p id="result-kicker" class="eyebrow"></p>
+            <h2 id="result-title"></h2>
+          </div>
+          <button id="close-result" class="icon-button" type="button" aria-label="Close result">×</button>
+        </div>
+        <p id="result-summary" class="result-summary"></p>
+        <dl id="result-fields" class="result-fields"></dl>
+        <p id="result-note" class="result-note"></p>
+      </section>
+
+      <footer>
+        <span>v0.1 browser preview</span>
+        <span>No scanning in the background</span>
+      </footer>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

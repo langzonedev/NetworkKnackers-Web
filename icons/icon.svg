@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Network Knackers">
+  <rect width="512" height="512" rx="112" fill="#07131f"/>
+  <path d="M116 350V270M206 350V202M296 350V138M386 350V88" stroke="#80f0d0" stroke-width="42" stroke-linecap="round"/>
+  <path d="M100 404h312" stroke="#a28cff" stroke-width="26" stroke-linecap="round"/>
+</svg>
