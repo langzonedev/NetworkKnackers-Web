@@ -1,6 +1,6 @@
 import { readFile, access } from "node:fs/promises";
 
-const required = ["index.html", "styles.css", "app.js", "capabilities.js", "tools.js", "manifest.webmanifest", "sw.js", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
+const required = ["index.html", "styles.css", "app.js", "capabilities.js", "tools.js", "extra-tools.js", "manifest.webmanifest", "sw.js", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
 await Promise.all(required.map((path) => access(new URL(`../${path}`, import.meta.url))));
 
 const manifest = JSON.parse(await readFile(new URL("../manifest.webmanifest", import.meta.url), "utf8"));

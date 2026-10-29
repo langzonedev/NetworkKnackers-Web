@@ -1,4 +1,4 @@
-import { capabilityModules } from './capabilities.js?v=0.2.1';
+import { capabilityModules } from './capabilities.js?v=0.3.0';
 const $ = selector => document.querySelector(selector);
 const tools = capabilityModules.filter(tool => tool.availability === 'available');
 let activeModuleId = 'subnet.calculate';
@@ -21,7 +21,7 @@ function renderDeck() {
     return card;
   }));
   $('#empty-search').hidden = visible.length > 0;
-  $('#categories').replaceChildren(...['All tools', 'My Network', 'Test Something', 'Calculate'].map(name => {
+  $('#categories').replaceChildren(...['All tools', ...new Set(tools.map(tool => tool.category))].map(name => {
     const button = node('button', name); button.type = 'button'; button.setAttribute('aria-pressed', String(category === name));
     button.addEventListener('click', () => { category = name; renderDeck(); });
     return button;
@@ -43,12 +43,12 @@ function selectTool(tool, focus = false) {
     if (spec.options) {
       input = node('select');
       spec.options.forEach((value, index) => { const option = node('option', spec.labels?.[index] || value); option.value = value; input.append(option); });
-    } else { input = node('input'); input.type = 'text'; input.required = true; input.placeholder = spec.placeholder; input.value = spec.value || ''; input.autocomplete = 'off'; input.spellcheck = false; input.setAttribute('autocapitalize', 'none'); }
+    } else { input = node(spec.multiline ? 'textarea' : 'input'); if (!spec.multiline) input.type = 'text'; input.required = spec.required !== false; if (spec.multiline) { input.rows = 6; input.maxLength = 100000; label.classList.add('multiline-input'); } input.placeholder = spec.placeholder; input.value = spec.value || ''; input.autocomplete = 'off'; input.spellcheck = false; input.setAttribute('autocapitalize', 'none'); }
     input.name = spec.name;
     if (drafts.get(tool.id)?.[spec.name] !== undefined) input.value = drafts.get(tool.id)[spec.name];
     label.append(input); return label;
   }));
-  $('#run-tool').textContent = tool.id === 'subnet.calculate' ? 'Calculate subnet' : tool.id === 'connection.snapshot' ? 'Read browser signals' : 'Run check';
+  $('#run-tool').textContent = tool.action || (tool.id === 'subnet.calculate' ? 'Calculate subnet' : tool.id === 'connection.snapshot' ? 'Read browser signals' : tool.activity === 'active' ? 'Run check' : 'Run tool');
   $('#result-panel').hidden = true; $('#result-placeholder').hidden = false;
   renderDeck();
   if (focus) { $('#workspace').focus({ preventScroll: true }); $('#workspace').scrollIntoView({ behavior: 'auto', block: 'nearest' }); }
@@ -63,17 +63,19 @@ function renderResult(result) {
   $('#result-note').textContent = [result.note, result.checkedAt ? `Checked ${new Date(result.checkedAt).toLocaleString()}.` : ''].filter(Boolean).join(' ');
   $('#result-fields').replaceChildren(...(result.fields || []).map(field => {
     const row = node('div', undefined, 'result-row'); const term = node('dt', field.label); const def = node('dd');
-    def.append(node('strong', field.value), node('span', field.kind === 'derived' ? 'Calculated' : field.kind, 'provenance'), node('small', field.detail)); row.append(term, def); return row;
+    const copyValue = node('button', 'Copy value', 'copy-value'); copyValue.type = 'button'; copyValue.setAttribute('aria-label', `Copy ${field.label}`); copyValue.addEventListener('click', () => copyText(field.value, `${field.label} copied.`));
+    const value = node('strong', field.value, 'result-value');
+    def.append(value, copyValue, node('span', field.kind === 'derived' ? 'Calculated' : field.kind, 'provenance'), node('small', field.detail)); row.append(term, def); return row;
   }));
   $('#raw-details').hidden = !result.raw; $('#raw-details').open = false;
   $('#raw-result').textContent = result.raw ? JSON.stringify(result.raw, null, 2) : '';
-  $('#copy-result').disabled = false; $('#copy-feedback').textContent = ''; $('#copy-fallback').hidden = true;
+  $('#copy-result').disabled = false; $('#export-result').disabled = false; $('#copy-feedback').textContent = ''; $('#copy-fallback').hidden = true;
 }
 $('#tool-form').addEventListener('submit', async event => {
   event.preventDefault(); stopRun(); const token = generation; const tool = selected();
   controller = new AbortController(); saveDraft();
   $('#run-tool').disabled = true; $('#cancel-tool').hidden = tool.activity !== 'active'; $('#tool-form').setAttribute('aria-busy', 'true');
-  $('#result-panel').hidden = false; $('#result-placeholder').hidden = true; $('#result-summary').textContent = 'Working…'; $('#result-title').textContent = tool.title; $('#result-fields').replaceChildren(); $('#result-note').textContent = ''; $('#result-kicker').textContent = 'Running'; $('#raw-details').hidden = true; $('#copy-result').disabled = true; $('#copy-feedback').textContent = ''; $('#copy-fallback').hidden = true;
+  $('#result-panel').hidden = false; $('#result-placeholder').hidden = true; $('#result-summary').textContent = 'Working…'; $('#result-title').textContent = tool.title; $('#result-fields').replaceChildren(); $('#result-note').textContent = ''; $('#result-kicker').textContent = 'Running'; $('#raw-details').hidden = true; $('#copy-result').disabled = true; $('#export-result').disabled = true; $('#copy-feedback').textContent = ''; $('#copy-fallback').hidden = true;
   try {
     const result = await tool.run({ navigator, input: drafts.get(tool.id), signal: controller.signal });
     if (token === generation) renderResult(result);
@@ -85,8 +87,17 @@ $('#cancel-tool').addEventListener('click', () => { stopRun(); renderResult({ st
 $('#copy-result').addEventListener('click', async () => {
   if (!lastResult) return;
   const text = [lastResult.title, lastResult.summary, ...(lastResult.fields || []).map(f => `${f.label}: ${f.value} [${f.kind}]${f.detail ? ` — ${f.detail}` : ''}`), lastResult.note || '', lastResult.checkedAt || ''].join('\n');
-  try { await navigator.clipboard.writeText(text); $('#copy-feedback').textContent = 'Result copied.'; }
+  await copyText(text, 'Result copied.');
+});
+async function copyText(text, message) {
+  try { await navigator.clipboard.writeText(text); $('#copy-feedback').textContent = message; $('#copy-fallback').hidden = true; }
   catch { $('#copy-fallback').value = text; $('#copy-fallback').hidden = false; $('#copy-fallback').focus(); $('#copy-fallback').select(); $('#copy-feedback').textContent = 'Clipboard unavailable. Select and copy the text below.'; }
+}
+$('#export-result').addEventListener('click', () => {
+  if (!lastResult) return;
+  const url = URL.createObjectURL(new Blob([JSON.stringify({ capability: activeModuleId, ...lastResult }, null, 2)], { type: 'application/json' }));
+  const link = node('a'); link.href = url; link.download = `networknackers-${activeModuleId}-${Date.now()}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  $('#copy-feedback').textContent = 'JSON export requested. Check your browser downloads.';
 });
 function updateLiveStatus() {
   $('#live-status').textContent = navigator.onLine ? 'Browser online' : 'Browser offline';
@@ -99,3 +110,5 @@ const connection = navigator.connection || navigator.mozConnection || navigator.
 connection?.addEventListener('change', updateLiveStatus);
 selectTool(selected()); updateLiveStatus();
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+
+$('#tool-count').textContent = `${tools.length} focused tools. No account needed.`;

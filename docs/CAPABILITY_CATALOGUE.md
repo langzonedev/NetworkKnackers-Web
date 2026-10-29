@@ -30,3 +30,8 @@ Reserved roadmap IDs: `dns.reverse`, `dns.compare`, `ip.rdap`, `domain.rdap`, `h
 - Provider terms and privacy are outside this app's control. API/policy references reviewed 2026-10-29: [ipify API and stated logging policy](https://www.ipify.org/), [Cloudflare JSON API](https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/), [Cloudflare resolver privacy](https://developers.cloudflare.com/1.1.1.1/privacy/public-dns-resolver/), [Cloudflare resolver terms](https://developers.cloudflare.com/1.1.1.1/terms-of-use/).
 
 HTTP headers, redirect chains and TLS certificate inspection require a separately reviewed backend/native boundary. No arbitrary URL proxy, raw sockets or CORS bypass is introduced.
+
+
+## v0.3 extension
+
+See [v0.3 capability additions and provider boundary](V0.3.md). Eight tools add reverse DNS, resolver comparison, IPv6 ranges, common ports, URL inspection, JSON, Base64 and SHA. New local adapters remain public/generic. Google DoH is user-initiated and disclosed; no proprietary/native code or raw sockets are introduced. Android has not gained these features merely because their IDs are catalogued here.
