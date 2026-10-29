@@ -1,5 +1,5 @@
-const CACHE = 'network-knackers-v0.2.1';
-const SHELL = ['./index.html?v=0.2.1', './styles.css?v=0.2.1', './app.js?v=0.2.1', './capabilities.js?v=0.2.1', './tools.js?v=0.2.1', './manifest.webmanifest?v=0.2.1', './icons/icon.svg?v=0.2.1', './icons/icon-192.png?v=0.2.1', './icons/icon-512.png?v=0.2.1'];
+const CACHE = 'network-knackers-v0.3.0';
+const SHELL = ['./index.html?v=0.3.0', './styles.css?v=0.3.0', './app.js?v=0.3.0', './capabilities.js?v=0.3.0', './tools.js?v=0.3.0', './extra-tools.js?v=0.3.0', './manifest.webmanifest?v=0.3.0', './icons/icon.svg?v=0.3.0', './icons/icon-192.png?v=0.3.0', './icons/icon-512.png?v=0.3.0'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
 });
@@ -13,7 +13,7 @@ self.addEventListener('fetch', event => {
   const shellURLs = SHELL.map(path => new URL(path, self.registration.scope).href);
   if (event.request.mode !== 'navigate' && !shellURLs.includes(url.href)) return;
   event.respondWith(caches.open(CACHE).then(async cache => {
-    const cached = await cache.match(event.request.mode === 'navigate' ? './index.html?v=0.2.1' : event.request);
+    const cached = await cache.match(event.request.mode === 'navigate' ? './index.html?v=0.3.0' : event.request);
     return cached || fetch(event.request);
   }));
 });

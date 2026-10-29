@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Network Knackers">
-  <rect width="512" height="512" rx="112" fill="#07131f"/>
-  <path d="M116 350V270M206 350V202M296 350V138M386 350V88" stroke="#80f0d0" stroke-width="42" stroke-linecap="round"/>
-  <path d="M100 404h312" stroke="#a28cff" stroke-width="26" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="NetworKnackers">
+  <rect width="512" height="512" rx="112" fill="#11152a"/>
+  <rect x="44" y="44" width="424" height="424" rx="88" fill="none" stroke="#b7f17c" stroke-width="10"/>
+  <path d="M174 142V370M184 264L332 142M184 264L338 370" fill="none" stroke="#b7f17c" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="332" cy="142" r="29" fill="#b7f17c"/><circle cx="338" cy="370" r="29" fill="#b7f17c"/>
 </svg>

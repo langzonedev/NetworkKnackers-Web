@@ -65,26 +65,39 @@ export async function lookupPublicIP({ family = '4' } = {}, context = {}) {
   return result('Public IP', `Your public IPv${family} address as seen by ipify.`, [field(`Public IPv${family}`, data.ip, `Observed by ${endpoint}. This may be a VPN, proxy or shared NAT exit address.`)], 'One HTTPS request to ipify. An IPv6 failure does not prove your network lacks IPv6. This is not your local device address.', data);
 }
 function validIPv4(value) { try { parseIPv4(value); return true; } catch { return false; } }
-export function isIPv6(value) {
-  if (typeof value !== 'string' || !/^[0-9a-f:]+$/i.test(value) || !value.includes(':')) return false;
+export function expandIPv6(input) {
+  let value = String(input).toLowerCase();
+  if (value.includes('.')) {
+    const split = value.lastIndexOf(':');
+    if (split < 0) throw new Error('Enter an IPv6 address.');
+    const v4 = parseIPv4(value.slice(split + 1));
+    value = `${value.slice(0, split + 1)}${Math.floor(v4 / 65536).toString(16)}:${(v4 % 65536).toString(16)}`;
+  }
+  if (!/^[0-9a-f:]+$/.test(value) || !value.includes(':')) throw new Error('Enter an IPv6 address without a zone ID or brackets.');
   const halves = value.split('::');
-  if (halves.length > 2) return false;
   const groups = halves.flatMap(h => h ? h.split(':') : []);
-  return groups.every(g => /^[0-9a-f]{1,4}$/i.test(g)) && (halves.length === 2 ? groups.length < 8 : groups.length === 8);
+  if (halves.length > 2 || !groups.every(g => /^[0-9a-f]{1,4}$/.test(g)) || (halves.length === 2 ? groups.length >= 8 : groups.length !== 8)) throw new Error('Enter a valid IPv6 address.');
+  const words = halves.length === 2 ? [...(halves[0] ? halves[0].split(':') : []), ...Array(8 - groups.length).fill('0'), ...(halves[1] ? halves[1].split(':') : [])] : groups;
+  return words.map(word => word.padStart(4, '0'));
 }
-export async function resolveDNS({ name, type = 'A' }, context = {}) {
+export function isIPv6(value) { try { expandIPv6(value); return true; } catch { return false; } }
+export const DNS_RESOLVERS = Object.freeze({ cloudflare: { title: 'Cloudflare', endpoint: 'https://cloudflare-dns.com/dns-query' }, google: { title: 'Google', endpoint: 'https://dns.google/resolve' } });
+export async function resolveDNS({ name, type = 'A', resolver = 'cloudflare' }, context = {}) {
   name = normalizeDNSName(name);
   if (!Object.hasOwn(DNS_TYPES, type)) throw new Error('Choose a supported DNS record type.');
-  const url = new URL('https://cloudflare-dns.com/dns-query');
+  if (!Object.hasOwn(DNS_RESOLVERS, resolver)) throw new Error('Choose a supported resolver.');
+  const provider = DNS_RESOLVERS[resolver];
+  const url = new URL(provider.endpoint);
   url.search = new URLSearchParams({ name, type });
+  if (resolver === 'google') url.searchParams.set('edns_client_subnet', '0.0.0.0/0');
   const data = await fetchJSON(url.href, { ...context, headers: { accept: 'application/dns-json' } });
-  if (!data || !Number.isInteger(data.Status) || data.Status < 0 || data.Status > 15 || (data.Answer !== undefined && (!Array.isArray(data.Answer) || data.Answer.some(a => typeof a.name !== 'string' || typeof a.data !== 'string' || !Number.isInteger(a.type) || !Number.isFinite(a.TTL) || a.TTL < 0)))) throw new Error('The resolver returned an invalid DNS response.');
+  if (!data || !Number.isInteger(data.Status) || data.Status < 0 || data.Status > 15 || (data.Answer !== undefined && (!Array.isArray(data.Answer) || data.Answer.some(a => !a || typeof a.name !== 'string' || typeof a.data !== 'string' || !Number.isInteger(a.type) || !Number.isFinite(a.TTL) || a.TTL < 0)))) throw new Error('The resolver returned an invalid DNS response.');
   const rcode = { 0: 'NOERROR', 1: 'FORMERR', 2: 'SERVFAIL', 3: 'NXDOMAIN', 4: 'NOTIMP', 5: 'REFUSED' }[data.Status] || `RCODE ${data.Status}`;
   const answers = data.Answer || [];
   const summary = data.Status === 0 ? answers.length ? `${name} returned ${answers.length} answer record${answers.length === 1 ? '' : 's'}.` : `${name}: no ${type} answer records returned.` : data.Status === 3 ? `${name}: the resolver reports that this name does not exist (NXDOMAIN).` : `${name}: the resolver returned ${rcode}.`;
-  const fields = [field('DNS response', rcode, 'Observed via Cloudflare DNS-over-HTTPS.')];
-  for (const answer of answers) fields.push(field(`${Object.keys(DNS_TYPES).find(k => DNS_TYPES[k] === answer.type) || `TYPE${answer.type}`} · ${answer.name}`, answer.data, `TTL ${answer.TTL} seconds · Cloudflare recursive resolver`));
-  const output = result('DNS Lookup', summary, fields, 'Cloudflare receives the query name and your public IP. This does not test your OS-configured resolver or prove global propagation. TTLs reflect this resolver’s cache.', data);
+  const fields = [field('DNS response', rcode, `Observed via ${provider.title} DNS-over-HTTPS.`)];
+  for (const answer of answers) fields.push(field(`${Object.keys(DNS_TYPES).find(k => DNS_TYPES[k] === answer.type) || `TYPE${answer.type}`} · ${answer.name}`, answer.data, `TTL ${answer.TTL} seconds · ${provider.title} recursive resolver`));
+  const output = result('DNS Lookup', summary, fields, `${provider.title} receives the query name and your public IP. This does not test your OS-configured resolver or prove global propagation. TTLs reflect this resolver’s cache.`, data);
   if (data.Status !== 0 && data.Status !== 3) output.status = 'error';
   return output;
 }

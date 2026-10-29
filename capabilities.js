@@ -1,4 +1,5 @@
-import { webTools } from "./tools.js?v=0.2.1";
+import { webTools } from "./tools.js?v=0.3.0";
+import { extraTools } from "./extra-tools.js?v=0.3.0";
 
 export const RESULT_STATUS = Object.freeze({
   SUCCESS: "success",
@@ -64,6 +65,7 @@ export const capabilityModules = Object.freeze([
     run: ({ navigator: navigatorLike }) => Promise.resolve(formatConnectionSnapshot(navigatorLike))
   },
   ...webTools,
+  ...extraTools,
   {
     id: "gateway.identify",
     title: "Identify Gateway",

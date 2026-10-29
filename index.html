@@ -5,34 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#11152a" />
   <meta name="description" content="Practical network answers. Public IP, DNS lookup and offline subnet calculations in one approachable toolkit." />
-  <link rel="manifest" href="manifest.webmanifest?v=0.2.1" />
-  <link rel="icon" href="icons/icon.svg?v=0.2.1" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css?v=0.2.1" />
-  <title>Network Knackers · Network toolkit</title>
+  <link rel="manifest" href="manifest.webmanifest?v=0.3.0" />
+  <link rel="icon" href="icons/icon.svg?v=0.3.0" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css?v=0.3.0" />
+  <title>NetworKnackers · Network toolkit</title>
 </head>
 <body>
 <a class="skip" href="#workspace">Skip to tool</a>
 <div class="app-shell">
   <header class="app-header">
-    <a class="brand" href="./" aria-label="Network Knackers home"><span class="brand-mark" aria-hidden="true">⌘</span><span>Network Knackers<small>LANG SYSTEMS / NETWORK TOOLKIT</small></span></a>
+    <a class="brand" href="./" aria-label="NetworKnackers home"><span class="brand-mark" aria-hidden="true">K</span><span>Networ<span class="shared-k">K</span>nackers<small>LANG SYSTEMS / NETWORK TOOLKIT</small></span></a>
     <span id="live-status" class="live-status" role="status">Checking…</span>
   </header>
   <main>
-    <section class="intro" aria-labelledby="deck-title"><p class="eyebrow">A LITTLE CLARITY FOR YOUR NETWORK</p><h1 id="deck-title">What do you need<br>to <em>figure out?</em></h1><p>Useful answers, without the guesswork.<br>Choose a tool. Get the detail you need.</p></section>
+    <section class="intro" aria-labelledby="deck-title"><p class="eyebrow">Balls deep in your network stack</p><h1 id="deck-title">What do you need<br>to <em>figure out?</em></h1><p>Useful answers, without the guesswork.<br>Choose a tool. Get the detail you need.</p></section>
     <div class="workbench">
       <aside class="toolbox" aria-label="Toolbox">
         <label class="search-label" for="tool-search">Find a tool</label><input id="tool-search" type="search" placeholder="Search tools…" autocomplete="off" />
         <nav id="categories" aria-label="Tool categories"></nav>
         <div id="action-deck" class="action-deck" aria-label="Network actions"></div>
         <p id="empty-search" hidden>No matching tools. Try “DNS” or “subnet”.</p>
-        <p class="toolbox-note">Four focused tools. No account needed.</p>
+        <p id="tool-count" class="toolbox-note"></p>
       </aside>
       <section id="workspace" class="workspace" aria-labelledby="tool-title" tabindex="-1">
         <div class="workspace-heading"><span id="tool-category" class="eyebrow"></span><span id="tool-badge" class="badge"></span></div>
         <h2 id="tool-title"></h2><p id="tool-description" class="muted"></p>
         <form id="tool-form"><div id="tool-inputs" class="tool-inputs"></div><p id="disclosure" class="disclosure"></p><div class="actions"><button id="run-tool" class="primary" type="submit">Run check</button><button id="cancel-tool" type="button" hidden>Cancel</button></div></form>
         <section id="result-panel" aria-labelledby="result-title" hidden>
-          <div class="result-heading"><p id="result-kicker" class="eyebrow"></p><button id="copy-result" type="button" disabled>Copy result</button></div>
+          <div class="result-heading"><p id="result-kicker" class="eyebrow"></p><div class="result-actions"><button id="copy-result" type="button" disabled>Copy result</button><button id="export-result" type="button" disabled>Export JSON</button></div></div>
           <h3 id="result-title"></h3><p id="result-summary" role="status"></p><dl id="result-fields"></dl><p id="result-note" class="result-note"></p>
           <details id="raw-details" hidden><summary>Technical details / JSON</summary><pre id="raw-result"></pre></details>
           <p id="copy-feedback" role="status"></p><textarea id="copy-fallback" aria-label="Result text for manual copying" readonly hidden></textarea>
@@ -42,8 +42,8 @@
     </div>
     <details class="platform-note"><summary>Need your gateway, local IP or device discovery?</summary><p>Those require native OS access. A browser cannot reliably read your routing table, configured DNS or local interface details. Native and desktop capabilities are on the roadmap; this PWA never guesses them.</p></details>
   </main>
-  <footer><span>v0.2.1 development preview</span><span>Local when possible. Transparent when online.</span></footer>
+  <footer><span>v0.3.0 development preview</span><span>Local when possible. Transparent when online.</span></footer>
 </div>
-<script type="module" src="app.js?v=0.2.1"></script>
+<script type="module" src="app.js?v=0.3.0"></script>
 </body>
 </html>
