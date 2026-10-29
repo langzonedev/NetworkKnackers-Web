@@ -2,7 +2,7 @@
 
 **[Open the PWA / install on mobile](https://langzonedev.github.io/NetworkKnackers-Web/)**
 
-v0.2 development preview: an approachable, browser-safe network toolkit. Public preview publication was requested by Greg on 2026-10-29; this is not a commercial production launch.
+v0.2.1 development preview: an approachable, browser-safe network toolkit. Public preview publication was requested by Greg on 2026-10-29; this is not a commercial production launch.
 
 ## Use it
 
@@ -19,7 +19,7 @@ Online tools disclose their provider before running. They send your public IP, a
 
 ## PWA / updates
 
-Relative paths support GitHub Pages project hosting. PNG icons at 192 and 512 pixels accompany the standalone manifest. The service worker precaches only app assets, bypasses external requests, and waits for old tabs to close before activating an update. Close all app/browser tabs and reopen to receive a waiting version. If upgrading the v0.1 preview, reload once after its old worker has updated.
+Relative paths support GitHub Pages project hosting. PNG icons at 192 and 512 pixels accompany the standalone manifest. The service worker precaches only app assets, bypasses external requests, and waits for old tabs to close before activating an update. Close all app/browser tabs and reopen to receive a waiting version. If upgrading the v0.1 preview, reload once after its old worker has updated. If it still shows v0.1, clear this site’s cached data and reopen.
 
 ## Develop and verify
 
