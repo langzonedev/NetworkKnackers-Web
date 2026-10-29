@@ -1,4 +1,4 @@
-import { webTools } from "./tools.js";
+import { webTools } from "./tools.js?v=0.2.1";
 
 export const RESULT_STATUS = Object.freeze({
   SUCCESS: "success",

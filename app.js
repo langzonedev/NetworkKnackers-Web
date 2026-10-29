@@ -1,4 +1,4 @@
-import { capabilityModules } from './capabilities.js';
+import { capabilityModules } from './capabilities.js?v=0.2.1';
 const $ = selector => document.querySelector(selector);
 const tools = capabilityModules.filter(tool => tool.availability === 'available');
 let activeModuleId = 'subnet.calculate';
