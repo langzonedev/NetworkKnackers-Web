@@ -1,3 +1,5 @@
+import { webTools } from "./tools.js";
+
 export const RESULT_STATUS = Object.freeze({
   SUCCESS: "success",
   UNSUPPORTED: "unsupported",
@@ -52,6 +54,8 @@ export function formatConnectionSnapshot(navigatorLike = {}) {
 export const capabilityModules = Object.freeze([
   {
     id: "connection.snapshot",
+    category: "My Network",
+    disclosure: "Reads browser signals on this device. No external request.",
     title: "My Connection",
     description: "See the connection signals this browser genuinely exposes.",
     availability: "available",
@@ -59,6 +63,7 @@ export const capabilityModules = Object.freeze([
     activity: "passive",
     run: ({ navigator: navigatorLike }) => Promise.resolve(formatConnectionSnapshot(navigatorLike))
   },
+  ...webTools,
   {
     id: "gateway.identify",
     title: "Identify Gateway",
